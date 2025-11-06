@@ -1,7 +1,6 @@
 import React from "react";
 import RoomCard from "@/components/RoomCard";
 import { mockRooms } from "@/data/mockData";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 
 const RoomsPage: React.FC = () => {
   return (
@@ -12,7 +11,6 @@ const RoomsPage: React.FC = () => {
           <RoomCard key={room.id} room={room} />
         ))}
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

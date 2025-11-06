@@ -4,7 +4,6 @@ import { Booking } from "@/types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import BookingCard from "@/components/BookingCard";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Search, CalendarIcon } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -158,7 +157,6 @@ const MyBookingsPage: React.FC = () => {
           <p className="col-span-full text-center text-muted-foreground">Nessuna prenotazione trovata.</p>
         )}
       </div>
-      <MadeWithDyad />
     </div>
   );
 };

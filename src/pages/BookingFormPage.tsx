@@ -4,7 +4,6 @@ import { mockRooms, addBooking, mockBookings } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -12,14 +11,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { cn, generateTimeSlots } from "@/lib/utils"; // Import generateTimeSlots
+import { cn, generateTimeSlots } from "@/lib/utils";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { showSuccess, showError } from "@/utils/toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
-import { Booking } from "@/types"; // Import Booking type
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Booking } from "@/types";
 
-// Definizione manuale del tipo per i valori del form, poiché lo schema è dinamico
 interface BookingFormValues {
   title: string;
   organizer: string;
@@ -28,7 +26,6 @@ interface BookingFormValues {
   endTime: string;
 }
 
-// Funzione per creare lo schema Zod dinamico
 const createBookingFormSchema = (roomId: string, currentBookingId: string | undefined, currentMockBookings: Booking[]) => z.object({
   title: z.string().min(2, { message: "Il titolo deve contenere almeno 2 caratteri." }),
   organizer: z.string().min(2, { message: "Il nome dell'organizzatore deve contenere almeno 2 caratteri." }),
@@ -49,7 +46,6 @@ const createBookingFormSchema = (roomId: string, currentBookingId: string | unde
   message: "L'ora di fine deve essere successiva all'ora di inizio.",
   path: ["endTime"],
 }).refine((data) => {
-    // Check for booking overlaps
     const { date, startTime, endTime } = data;
 
     const newBookingStart = new Date(date);
@@ -60,15 +56,13 @@ const createBookingFormSchema = (roomId: string, currentBookingId: string | unde
     const [newEndHour, newEndMinute] = endTime.split(':').map(Number);
     newBookingEnd.setHours(newEndHour, newEndMinute, 0, 0);
 
-    // Filter existing bookings for the same room and date
     const existingBookingsForRoomAndDate = currentMockBookings.filter(
       (booking) =>
         booking.roomId === roomId &&
-        booking.id !== currentBookingId && // Escludi la prenotazione corrente dalla verifica di sovrapposizione
+        booking.id !== currentBookingId &&
         format(booking.startTime, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
     );
 
-    // Check for overlaps
     const hasOverlap = existingBookingsForRoomAndDate.some((existingBooking) => {
       const existingStart = existingBooking.startTime;
       const existingEnd = existingBooking.endTime;
@@ -89,11 +83,10 @@ const BookingFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const room = mockRooms.find((r) => r.id === id);
-  const roomId = id || ''; // Assicurati che roomId sia sempre una stringa
+  const roomId = id || '';
 
-  const timeSlots = generateTimeSlots(); // Genera gli slot orari
+  const timeSlots = generateTimeSlots();
 
-  // Usa la funzione per creare lo schema Zod
   const bookingFormSchema = createBookingFormSchema(roomId, undefined, mockBookings);
 
   const form = useForm<BookingFormValues>({
@@ -117,7 +110,6 @@ const BookingFormPage: React.FC = () => {
             <ArrowLeft className="mr-2 h-4 w-4" /> Torna alle Sale
           </Button>
         </Link>
-        <MadeWithDyad />
       </div>
     );
   }
@@ -150,7 +142,6 @@ const BookingFormPage: React.FC = () => {
     }
   };
 
-  // Get today's date at midnight for disabling past dates
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -223,9 +214,9 @@ const BookingFormPage: React.FC = () => {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < today} // Disable dates before today (midnight)
+                          disabled={(date) => date < today}
                           initialFocus
-                          locale={it} // Explicitly set locale
+                          locale={it}
                         />
                       </PopoverContent>
                     </Popover>
@@ -288,7 +279,6 @@ const BookingFormPage: React.FC = () => {
           </Form>
         </CardContent>
       </Card>
-      <MadeWithDyad />
     </div>
   );
 };

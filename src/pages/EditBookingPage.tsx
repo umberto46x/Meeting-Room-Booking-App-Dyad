@@ -4,7 +4,6 @@ import { mockRooms, mockBookings, updateBooking } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
-import { MadeWithDyad } from "@/components/made-with-dyad";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -12,14 +11,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { cn, generateTimeSlots } from "@/lib/utils"; // Import generateTimeSlots
+import { cn, generateTimeSlots } from "@/lib/utils";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { showSuccess, showError } from "@/utils/toast";
 import { Booking } from "@/types";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Definizione manuale del tipo per i valori del form
 interface BookingFormValues {
   title: string;
   organizer: string;
@@ -61,7 +59,7 @@ const createBookingFormSchema = (roomId: string, currentBookingId: string | unde
   const existingBookingsForRoomAndDate = currentMockBookings.filter(
     (booking) =>
       booking.roomId === roomId &&
-      booking.id !== currentBookingId && // Escludi la prenotazione corrente dalla verifica di sovrapposizione
+      booking.id !== currentBookingId &&
       format(booking.startTime, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
   );
 
@@ -88,7 +86,7 @@ const EditBookingPage: React.FC = () => {
   const bookingToEdit = mockBookings.find((b) => b.id === bookingId && b.roomId === roomId);
 
   const bookingFormSchema = createBookingFormSchema(roomId || '', bookingId, mockBookings);
-  const timeSlots = generateTimeSlots(); // Genera gli slot orari
+  const timeSlots = generateTimeSlots();
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
@@ -106,7 +104,7 @@ const EditBookingPage: React.FC = () => {
       form.reset({
         title: bookingToEdit.title,
         organizer: bookingToEdit.organizer,
-        date: bookingToEdit.startTime, // Use startTime's date part
+        date: bookingToEdit.startTime,
         startTime: format(bookingToEdit.startTime, "HH:mm"),
         endTime: format(bookingToEdit.endTime, "HH:mm"),
       });
@@ -123,7 +121,6 @@ const EditBookingPage: React.FC = () => {
             <ArrowLeft className="mr-2 h-4 w-4" /> Torna alle Sale
           </Button>
         </Link>
-        <MadeWithDyad />
       </div>
     );
   }
@@ -139,7 +136,7 @@ const EditBookingPage: React.FC = () => {
       endTime.setHours(endHour, endMinute, 0, 0);
 
       const updatedBooking: Booking = {
-        ...bookingToEdit, // Keep the original ID
+        ...bookingToEdit,
         title: values.title,
         startTime,
         endTime,
@@ -155,7 +152,6 @@ const EditBookingPage: React.FC = () => {
     }
   };
 
-  // Get today's date at midnight for disabling past dates
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -228,9 +224,9 @@ const EditBookingPage: React.FC = () => {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < today} // Disable dates before today (midnight)
+                          disabled={(date) => date < today}
                           initialFocus
-                          locale={it} // Explicitly set locale
+                          locale={it}
                         />
                       </PopoverContent>
                     </Popover>
@@ -293,7 +289,6 @@ const EditBookingPage: React.FC = () => {
           </Form>
         </CardContent>
       </Card>
-      <MadeWithDyad />
     </div>
   );
 };
