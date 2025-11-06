@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { showSuccess, showError } from "@/utils/toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Import Select components
+import { Booking } from "@/types"; // Import Booking type
 
 // Definizione manuale del tipo per i valori del form, poiché lo schema è dinamico
 interface BookingFormValues {
@@ -27,35 +28,27 @@ interface BookingFormValues {
   endTime: string;
 }
 
-const BookingFormPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const room = mockRooms.find((r) => r.id === id);
-  const roomId = id || ''; // Assicurati che roomId sia sempre una stringa
+// Funzione per creare lo schema Zod dinamico
+const createBookingFormSchema = (roomId: string, currentBookingId: string | undefined, currentMockBookings: Booking[]) => z.object({
+  title: z.string().min(2, { message: "Il titolo deve contenere almeno 2 caratteri." }),
+  organizer: z.string().min(2, { message: "Il nome dell'organizzatore deve contenere almeno 2 caratteri." }),
+  date: z.date({ required_error: "Seleziona una data per la prenotazione." }),
+  startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: "Formato ora non valido (HH:MM)." }),
+  endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: "Formato ora non valido (HH:MM)." }),
+}).refine((data) => {
+  const start = new Date(data.date);
+  const [startHour, startMinute] = data.startTime.split(':').map(Number);
+  start.setHours(startHour, startMinute, 0, 0);
 
-  const timeSlots = generateTimeSlots(); // Genera gli slot orari
+  const end = new Date(data.date);
+  const [endHour, endMinute] = data.endTime.split(':').map(Number);
+  end.setHours(endHour, endMinute, 0, 0);
 
-  // Sposta la definizione dello schema Zod all'interno del componente
-  const bookingFormSchema = z.object({
-    title: z.string().min(2, { message: "Il titolo deve contenere almeno 2 caratteri." }),
-    organizer: z.string().min(2, { message: "Il nome dell'organizzatore deve contenere almeno 2 caratteri." }),
-    date: z.date({ required_error: "Seleziona una data per la prenotazione." }),
-    startTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: "Formato ora non valido (HH:MM)." }),
-    endTime: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, { message: "Formato ora non valido (HH:MM)." }),
-  }).refine((data) => {
-    const start = new Date(data.date);
-    const [startHour, startMinute] = data.startTime.split(':').map(Number);
-    start.setHours(startHour, startMinute, 0, 0);
-
-    const end = new Date(data.date);
-    const [endHour, endMinute] = data.endTime.split(':').map(Number);
-    end.setHours(endHour, endMinute, 0, 0);
-
-    return end > start;
-  }, {
-    message: "L'ora di fine deve essere successiva all'ora di inizio.",
-    path: ["endTime"],
-  }).refine((data) => {
+  return end > start;
+}, {
+  message: "L'ora di fine deve essere successiva all'ora di inizio.",
+  path: ["endTime"],
+}).refine((data) => {
     // Check for booking overlaps
     const { date, startTime, endTime } = data;
 
@@ -68,9 +61,10 @@ const BookingFormPage: React.FC = () => {
     newBookingEnd.setHours(newEndHour, newEndMinute, 0, 0);
 
     // Filter existing bookings for the same room and date
-    const existingBookingsForRoomAndDate = mockBookings.filter(
+    const existingBookingsForRoomAndDate = currentMockBookings.filter(
       (booking) =>
-        booking.roomId === roomId && // Usa roomId direttamente dallo scope del componente
+        booking.roomId === roomId &&
+        booking.id !== currentBookingId && // Escludi la prenotazione corrente dalla verifica di sovrapposizione
         format(booking.startTime, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
     );
 
@@ -89,6 +83,18 @@ const BookingFormPage: React.FC = () => {
     message: "La sala è già prenotata per questo intervallo di tempo.",
     path: ["startTime"],
   });
+
+
+const BookingFormPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const room = mockRooms.find((r) => r.id === id);
+  const roomId = id || ''; // Assicurati che roomId sia sempre una stringa
+
+  const timeSlots = generateTimeSlots(); // Genera gli slot orari
+
+  // Usa la funzione per creare lo schema Zod
+  const bookingFormSchema = createBookingFormSchema(roomId, undefined, mockBookings);
 
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
