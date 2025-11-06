@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { mockRooms, addBooking } from "@/data/mockData";
+import { mockRooms, addBooking, mockBookings } from "@/data/mockData"; // Import mockBookings
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CalendarIcon } from "lucide-react";
@@ -36,6 +36,46 @@ const bookingFormSchema = z.object({
 }, {
   message: "L'ora di fine deve essere successiva all'ora di inizio.",
   path: ["endTime"],
+}).refine((data) => {
+  // Check for booking overlaps
+  const { date, startTime, endTime } = data;
+  const { id: roomId } = useParams<{ id: string }>(); // Get roomId from params
+
+  if (!roomId) return true; // Should not happen if room is found
+
+  const newBookingStart = new Date(date);
+  const [newStartHour, newStartMinute] = startTime.split(':').map(Number);
+  newBookingStart.setHours(newStartHour, newStartMinute, 0, 0);
+
+  const newBookingEnd = new Date(date);
+  const [newEndHour, newEndMinute] = endTime.split(':').map(Number);
+  newBookingEnd.setHours(newEndHour, newEndMinute, 0, 0);
+
+  // Filter existing bookings for the same room and date
+  const existingBookingsForRoomAndDate = mockBookings.filter(
+    (booking) =>
+      booking.roomId === roomId &&
+      format(booking.startTime, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+  );
+
+  // Check for overlaps
+  const hasOverlap = existingBookingsForRoomAndDate.some((existingBooking) => {
+    const existingStart = existingBooking.startTime;
+    const existingEnd = existingBooking.endTime;
+
+    // Overlap conditions:
+    // 1. New booking starts during an existing booking
+    // 2. New booking ends during an existing booking
+    // 3. Existing booking starts during the new booking (new booking fully contains existing)
+    return (
+      (newBookingStart < existingEnd && newBookingEnd > existingStart)
+    );
+  });
+
+  return !hasOverlap;
+}, {
+  message: "La sala è già prenotata per questo intervallo di tempo.",
+  path: ["startTime"], // Attach error to startTime field
 });
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
