@@ -7,6 +7,7 @@ import { Users, MapPin, ArrowLeft } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import BookingCard from "@/components/BookingCard";
 import { Booking } from "@/types"; // Import Booking type
+import RoomCalendar from "@/components/RoomCalendar"; // Import RoomCalendar
 
 const RoomDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -76,6 +77,8 @@ const RoomDetailsPage: React.FC = () => {
           <Link to={`/rooms/${room.id}/book`}>
             <Button className="w-full mt-6">Prenota questa Stanza</Button>
           </Link>
+
+          <RoomCalendar bookings={currentRoomBookings} /> {/* Add the RoomCalendar component here */}
         </CardContent>
       </Card>
       <MadeWithDyad />
