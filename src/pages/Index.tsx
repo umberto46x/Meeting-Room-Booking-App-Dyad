@@ -1,6 +1,7 @@
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import UpcomingBookings from "@/components/UpcomingBookings"; // Import the new component
 
 const Index = () => {
   return (
@@ -17,6 +18,7 @@ const Index = () => {
           </Button>
         </Link>
       </div>
+      <UpcomingBookings /> {/* Add the UpcomingBookings component here */}
       <MadeWithDyad />
     </div>
   );
