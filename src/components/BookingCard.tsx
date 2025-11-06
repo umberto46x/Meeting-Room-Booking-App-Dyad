@@ -1,15 +1,39 @@
 import React from "react";
 import { Booking } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, Clock, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Calendar, Clock, User, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { showSuccess, showError } from "@/utils/toast";
 
 interface BookingCardProps {
   booking: Booking;
+  onDelete: (bookingId: string) => void;
 }
 
-const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
+const BookingCard: React.FC<BookingCardProps> = ({ booking, onDelete }) => {
+  const handleDelete = () => {
+    try {
+      onDelete(booking.id);
+      showSuccess("Prenotazione eliminata con successo!");
+    } catch (error) {
+      console.error("Errore durante l'eliminazione della prenotazione:", error);
+      showError("Si è verificato un errore durante l'eliminazione della prenotazione.");
+    }
+  };
+
   return (
     <Card className="mb-4">
       <CardHeader>
@@ -30,6 +54,25 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
           <User className="h-4 w-4" />
           <span>Organizzatore: {booking.organizer}</span>
         </div>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm" className="mt-2 w-full">
+              <Trash2 className="mr-2 h-4 w-4" /> Elimina Prenotazione
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Sei assolutamente sicuro?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Questa azione non può essere annullata. Verrà eliminata permanentemente la prenotazione di "{booking.title}".
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Annulla</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDelete}>Elimina</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </CardContent>
     </Card>
   );

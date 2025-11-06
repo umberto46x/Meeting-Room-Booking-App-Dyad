@@ -1,16 +1,31 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { mockRooms, mockBookings } from "@/data/mockData";
+import { mockRooms, mockBookings, deleteBooking } from "@/data/mockData"; // Import deleteBooking
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Users, MapPin, ArrowLeft } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import BookingCard from "@/components/BookingCard";
+import { Booking } from "@/types"; // Import Booking type
 
 const RoomDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const room = mockRooms.find((r) => r.id === id);
-  const roomBookings = mockBookings.filter((booking) => booking.roomId === id);
+
+  // Usiamo useState per gestire le prenotazioni della stanza, così possiamo aggiornarle dopo l'eliminazione
+  const [currentRoomBookings, setCurrentRoomBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    if (id) {
+      setCurrentRoomBookings(mockBookings.filter((booking) => booking.roomId === id));
+    }
+  }, [id, mockBookings]); // Dipendenza da mockBookings per reagire ai cambiamenti globali
+
+  const handleDeleteBooking = (bookingId: string) => {
+    deleteBooking(bookingId);
+    // Aggiorna lo stato locale per riflettere l'eliminazione
+    setCurrentRoomBookings((prevBookings) => prevBookings.filter((booking) => booking.id !== bookingId));
+  };
 
   if (!room) {
     return (
@@ -48,10 +63,10 @@ const RoomDetailsPage: React.FC = () => {
           </div>
 
           <h2 className="text-2xl font-semibold mt-6 mb-4">Prossime Prenotazioni</h2>
-          {roomBookings.length > 0 ? (
+          {currentRoomBookings.length > 0 ? (
             <div className="space-y-4">
-              {roomBookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} />
+              {currentRoomBookings.map((booking) => (
+                <BookingCard key={booking.id} booking={booking} onDelete={handleDeleteBooking} />
               ))}
             </div>
           ) : (

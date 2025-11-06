@@ -71,3 +71,8 @@ export const addBooking = (newBooking: Booking) => {
   // In un'applicazione reale, qui si farebbe una chiamata API per salvare la prenotazione
   console.log("Nuova prenotazione aggiunta:", newBooking);
 };
+
+export const deleteBooking = (bookingId: string) => {
+  mockBookings = mockBookings.filter(booking => booking.id !== bookingId);
+  console.log("Prenotazione eliminata:", bookingId);
+};
