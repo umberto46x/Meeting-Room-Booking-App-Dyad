@@ -31,7 +31,7 @@ export const mockRooms: Room[] = [
   },
 ];
 
-export const mockBookings: Booking[] = [
+export let mockBookings: Booking[] = [
   {
     id: "booking-1",
     roomId: "room-1",
@@ -65,3 +65,9 @@ export const mockBookings: Booking[] = [
     organizer: "Luca Neri",
   },
 ];
+
+export const addBooking = (newBooking: Booking) => {
+  mockBookings = [...mockBookings, newBooking];
+  // In un'applicazione reale, qui si farebbe una chiamata API per salvare la prenotazione
+  console.log("Nuova prenotazione aggiunta:", newBooking);
+};

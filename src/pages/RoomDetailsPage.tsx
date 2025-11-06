@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Users, MapPin, ArrowLeft } from "lucide-react";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import BookingCard from "@/components/BookingCard"; // Import the new BookingCard component
+import BookingCard from "@/components/BookingCard";
 
 const RoomDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,7 +58,9 @@ const RoomDetailsPage: React.FC = () => {
             <p className="text-muted-foreground">Nessuna prenotazione per questa stanza al momento.</p>
           )}
           
-          <Button className="w-full mt-6">Prenota questa Stanza</Button>
+          <Link to={`/rooms/${room.id}/book`}>
+            <Button className="w-full mt-6">Prenota questa Stanza</Button>
+          </Link>
         </CardContent>
       </Card>
       <MadeWithDyad />
