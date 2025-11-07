@@ -30,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           !isMobile && "md:ml-64" // Adjust margin for desktop sidebar
         )}
       >
-        <div className="flex-1">
+        <div className="flex-1 container mx-auto px-4 sm:px-6 lg:px-8"> {/* Added padding and centering */}
           {children}
         </div>
         <MadeWithDyad />
