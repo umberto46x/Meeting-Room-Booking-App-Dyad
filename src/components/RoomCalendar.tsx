@@ -7,11 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface RoomCalendarProps {
   bookings: Booking[];
+  selectedDate?: Date; // Nuova prop per la data selezionata
+  onSelectDate?: (date: Date | undefined) => void; // Nuova prop per gestire la selezione della data
 }
 
-const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings }) => {
+const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings, selectedDate, onSelectDate }) => {
+  const bookedDays = bookings.map(booking => booking.startTime);
+
   const modifiers = {
-    booked: bookings.map(booking => booking.startTime),
+    booked: bookedDays,
   };
 
   const modifiersStyles = {
@@ -29,8 +33,9 @@ const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings }) => {
       </CardHeader>
       <CardContent className="flex justify-center">
         <DayPicker
-          mode="multiple"
-          selected={bookings.map(booking => booking.startTime)}
+          mode="single" // Cambiato a modalità singola
+          selected={selectedDate} // Usa la data selezionata
+          onSelect={onSelectDate} // Gestisce la selezione della data
           modifiers={modifiers}
           modifiersStyles={modifiersStyles}
           locale={it}

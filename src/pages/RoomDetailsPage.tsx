@@ -3,16 +3,19 @@ import { useParams, Link } from "react-router-dom";
 import { mockRooms, mockBookings, deleteBooking, subscribeToBookings } from "@/data/mockData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, MapPin, ArrowLeft } from "lucide-react";
+import { Users, MapPin, ArrowLeft, XCircle } from "lucide-react"; // Import XCircle for clear button
 import BookingCard from "@/components/BookingCard";
 import { Booking } from "@/types";
 import RoomCalendar from "@/components/RoomCalendar";
+import { format, isSameDay } from "date-fns"; // Import isSameDay
+import { it } from "date-fns/locale";
 
 const RoomDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const room = mockRooms.find((r) => r.id === id);
 
   const [currentRoomBookings, setCurrentRoomBookings] = useState<Booking[]>([]);
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date | undefined>(undefined);
 
   const updateRoomBookings = () => {
     if (id) {
@@ -24,11 +27,15 @@ const RoomDetailsPage: React.FC = () => {
     updateRoomBookings(); // Initial load
     const unsubscribe = subscribeToBookings(updateRoomBookings); // Subscribe to changes
     return () => unsubscribe(); // Cleanup subscription
-  }, [id]); // Only depends on id now
+  }, [id]);
 
   const handleDeleteBooking = (bookingId: string) => {
     deleteBooking(bookingId); // This will also call notifyBookingsChange()
     // The useEffect will then trigger updateRoomBookings, so no need for local filter here
+  };
+
+  const handleClearDateSelection = () => {
+    setSelectedCalendarDate(undefined);
   };
 
   if (!room) {
@@ -44,6 +51,10 @@ const RoomDetailsPage: React.FC = () => {
       </div>
     );
   }
+
+  const bookingsToDisplay = selectedCalendarDate
+    ? currentRoomBookings.filter((booking) => isSameDay(booking.startTime, selectedCalendarDate))
+    : currentRoomBookings;
 
   return (
     <div className="container mx-auto">
@@ -65,22 +76,41 @@ const RoomDetailsPage: React.FC = () => {
             <span className="text-muted-foreground">{room.location}</span>
           </div>
 
-          <h2 className="text-2xl font-semibold mt-6 mb-4">Prossime Prenotazioni</h2>
-          {currentRoomBookings.length > 0 ? (
-            <div className="space-y-4">
-              {currentRoomBookings.map((booking) => (
-                <BookingCard key={booking.id} booking={booking} onDelete={handleDeleteBooking} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">Nessuna prenotazione per questa stanza al momento.</p>
-          )}
-          
           <Link to={`/rooms/${room.id}/book`}>
             <Button className="w-full mt-6">Prenota questa Stanza</Button>
           </Link>
 
-          <RoomCalendar bookings={currentRoomBookings} />
+          <RoomCalendar
+            bookings={currentRoomBookings}
+            selectedDate={selectedCalendarDate}
+            onSelectDate={setSelectedCalendarDate}
+          />
+
+          <h2 className="text-2xl font-semibold mt-6 mb-4 flex items-center justify-between">
+            {selectedCalendarDate ? (
+              <>
+                Prenotazioni per il {format(selectedCalendarDate, "PPP", { locale: it })}
+                <Button variant="ghost" size="sm" onClick={handleClearDateSelection}>
+                  <XCircle className="mr-2 h-4 w-4" /> Cancella selezione
+                </Button>
+              </>
+            ) : (
+              "Tutte le Prossime Prenotazioni"
+            )}
+          </h2>
+          {bookingsToDisplay.length > 0 ? (
+            <div className="space-y-4">
+              {bookingsToDisplay.map((booking) => (
+                <BookingCard key={booking.id} booking={booking} onDelete={handleDeleteBooking} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              {selectedCalendarDate
+                ? `Nessuna prenotazione per il ${format(selectedCalendarDate, "PPP", { locale: it })}.`
+                : "Nessuna prenotazione per questa stanza al momento."}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
