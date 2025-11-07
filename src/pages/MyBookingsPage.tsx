@@ -82,7 +82,7 @@ const MyBookingsPage: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto">
       <h1 className="text-4xl font-bold text-center mb-8">Le mie Prenotazioni</h1>
       <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6 max-w-3xl mx-auto">
         <div className="relative flex-1 w-full">

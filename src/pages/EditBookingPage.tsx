@@ -156,7 +156,7 @@ const EditBookingPage: React.FC = () => {
   today.setHours(0, 0, 0, 0);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto">
       <Link to={`/rooms/${room.id}`} className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-6">
         <ArrowLeft className="mr-2 h-4 w-4" /> Torna ai Dettagli Stanza
       </Link>
