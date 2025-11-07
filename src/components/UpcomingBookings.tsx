@@ -7,8 +7,13 @@ import { it } from "date-fns/locale";
 import { Calendar, Clock, User } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils"; // Import cn utility
 
-const UpcomingBookings: React.FC = () => {
+interface UpcomingBookingsProps {
+  className?: string; // Add className prop
+}
+
+const UpcomingBookings: React.FC<UpcomingBookingsProps> = ({ className }) => {
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
 
   useEffect(() => {
@@ -20,7 +25,7 @@ const UpcomingBookings: React.FC = () => {
   }, [mockBookings]); // Re-run effect if mockBookings changes
 
   return (
-    <Card className="w-full max-w-2xl mx-auto mt-8">
+    <Card className={cn("w-full max-w-2xl mx-auto mt-8", className)}> {/* Apply className here */}
       <CardHeader>
         <CardTitle className="text-2xl">Prossime Prenotazioni</CardTitle>
         <CardDescription>Le tue prenotazioni in arrivo.</CardDescription>
