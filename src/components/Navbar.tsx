@@ -24,9 +24,11 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         <Link to="/" className="text-2xl font-bold">
           Booking App
         </Link>
+        {/* Su desktop, i link di navigazione sono ora gestiti dalla Sidebar. */}
+        {/* Il div seguente è stato rimosso per evitare la duplicazione dei link. */}
+        {/*
         {!isMobile && (
           <div className="space-x-4">
-            {/* Links are now primarily in the sidebar for desktop, but keeping them here for top-level access or if sidebar is not desired */}
             <Link to="/">
               <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
                 Home
@@ -44,6 +46,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             </Link>
           </div>
         )}
+        */}
       </div>
     </nav>
   );
