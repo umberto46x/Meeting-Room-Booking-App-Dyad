@@ -8,14 +8,14 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import NoContentFound from "@/components/NoContentFound";
-import { useBookings } from "@/context/BookingContext"; // Import useBookings
+import { useBookings } from "@/context/BookingContext";
 
 interface UpcomingBookingsProps {
   className?: string;
 }
 
 const UpcomingBookings: React.FC<UpcomingBookingsProps> = ({ className }) => {
-  const { bookings } = useBookings(); // Use bookings from context
+  const { bookings } = useBookings();
   const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
 
   const updateUpcomingBookings = useCallback(() => {
@@ -24,7 +24,7 @@ const UpcomingBookings: React.FC<UpcomingBookingsProps> = ({ className }) => {
       .filter((booking) => booking.endTime > now)
       .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
     setUpcomingBookings(filteredBookings);
-  }, [bookings]); // Depend on bookings from context
+  }, [bookings]);
 
   useEffect(() => {
     updateUpcomingBookings();
