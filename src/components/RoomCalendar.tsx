@@ -20,8 +20,8 @@ const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings, selectedDate, onS
 
   const modifiersStyles = {
     booked: {
-      backgroundColor: "hsl(var(--primary))",
-      color: "hsl(var(--primary-foreground))",
+      backgroundColor: "hsl(var(--accent))", // Colore più discreto per i giorni prenotati
+      color: "hsl(var(--accent-foreground))",
       borderRadius: "0.25rem",
     },
   };
@@ -58,7 +58,7 @@ const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings, selectedDate, onS
             day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100",
             day_range_start: "day-range-start",
             day_range_end: "day-range-end",
-            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground", // Stile forte per il giorno selezionato
             day_today: "bg-accent text-accent-foreground",
             day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
             day_disabled: "text-muted-foreground opacity-50",
