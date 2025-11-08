@@ -11,13 +11,13 @@ import EditBookingPage from "./pages/EditBookingPage";
 import MyBookingsPage from "./pages/MyBookingsPage";
 import Layout from "./components/Layout";
 import { BookingProvider } from "./context/BookingContext";
-import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
+import { ThemeProvider } from "./components/ThemeProvider";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"> {/* Wrap with ThemeProvider */}
+  <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"> {/* Spostato qui per avvolgere tutto */}
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
         <BrowserRouter>
@@ -37,8 +37,8 @@ const App = () => (
           </BookingProvider>
         </BrowserRouter>
       </TooltipProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;
