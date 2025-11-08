@@ -4,6 +4,8 @@ import { it } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import { Booking } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button"; // Importa Button
+import { XCircle } from "lucide-react"; // Importa XCircle
 
 interface RoomCalendarProps {
   bookings: Booking[];
@@ -26,10 +28,21 @@ const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings, selectedDate, onS
     },
   };
 
+  const handleClearDateSelection = () => {
+    if (onSelectDate) {
+      onSelectDate(undefined);
+    }
+  };
+
   return (
     <Card className="mt-8">
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-2xl">Disponibilità Calendario</CardTitle>
+        {selectedDate && (
+          <Button variant="ghost" size="sm" onClick={handleClearDateSelection} className="text-sm text-muted-foreground">
+            <XCircle className="mr-2 h-4 w-4" /> Cancella selezione
+          </Button>
+        )}
       </CardHeader>
       <CardContent className="flex justify-center">
         <DayPicker
@@ -63,9 +76,9 @@ const RoomCalendar: React.FC<RoomCalendarProps> = ({ bookings, selectedDate, onS
             day_outside: "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
             day_disabled: "text-muted-foreground opacity-50",
             day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
-            day_hidden: "invisible",
-            day_next_month: "hidden",
-            day_previous_month: "hidden",
+            day_hidden: "invisible", // Rimosso per mostrare i giorni dei mesi adiacenti
+            // day_next_month: "hidden", // Rimosso per mostrare i giorni dei mesi adiacenti
+            // day_previous_month: "hidden", // Rimosso per mostrare i giorni dei mesi adiacenti
           }}
         />
       </CardContent>
