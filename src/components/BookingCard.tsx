@@ -2,7 +2,7 @@ import React from "react";
 import { Booking } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, User, Trash2, Edit } from "lucide-react";
+import { Calendar, Clock, User, Trash2, Edit, MapPin } from "lucide-react"; // Aggiunto MapPin per l'icona della sala
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import {
@@ -18,14 +18,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { showSuccess, showError } from "@/utils/toast";
 import { Link } from "react-router-dom";
-import { useBookings } from "@/context/BookingContext"; // Import useBookings
+import { useBookings } from "@/context/BookingContext";
 
 interface BookingCardProps {
   booking: Booking;
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
-  const { deleteBooking } = useBookings(); // Use deleteBooking from context
+  const { deleteBooking, rooms } = useBookings(); // Ottieni rooms dal contesto
+  const room = rooms.find((r) => r.id === booking.roomId); // Trova la sala corrispondente
 
   const handleDelete = () => {
     try {
@@ -43,6 +44,12 @@ const BookingCard: React.FC<BookingCardProps> = ({ booking }) => {
         <CardTitle className="text-xl">{booking.title}</CardTitle>
       </CardHeader>
       <CardContent className="grid gap-2">
+        {room && ( // Mostra il nome della sala se trovata
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4" />
+            <span>Sala: {room.name}</span>
+          </div>
+        )}
         <div className="flex items-center space-x-2 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
           <span>{format(booking.startTime, "PPP", { locale: it })}</span>
