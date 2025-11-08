@@ -10,31 +10,34 @@ import BookingFormPage from "./pages/BookingFormPage";
 import EditBookingPage from "./pages/EditBookingPage";
 import MyBookingsPage from "./pages/MyBookingsPage";
 import Layout from "./components/Layout";
-import { BookingProvider } from "./context/BookingContext"; // Import BookingProvider
+import { BookingProvider } from "./context/BookingContext";
+import { ThemeProvider } from "./components/ThemeProvider"; // Import ThemeProvider
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Sonner />
-      <BrowserRouter>
-        <BookingProvider> {/* Wrap with BookingProvider */}
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/rooms" element={<RoomsPage />} />
-              <Route path="/rooms/:id" element={<RoomDetailsPage />} />
-              <Route path="/rooms/:id/book" element={<BookingFormPage />} />
-              <Route path="/rooms/:roomId/bookings/:bookingId/edit" element={<EditBookingPage />} />
-              <Route path="/my-bookings" element={<MyBookingsPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
-        </BookingProvider>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme"> {/* Wrap with ThemeProvider */}
+      <TooltipProvider>
+        <Sonner />
+        <BrowserRouter>
+          <BookingProvider>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/rooms" element={<RoomsPage />} />
+                <Route path="/rooms/:id" element={<RoomDetailsPage />} />
+                <Route path="/rooms/:id/book" element={<BookingFormPage />} />
+                <Route path="/rooms/:roomId/bookings/:bookingId/edit" element={<EditBookingPage />} />
+                <Route path="/my-bookings" element={<MyBookingsPage />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </BookingProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

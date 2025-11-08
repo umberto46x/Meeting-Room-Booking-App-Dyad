@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ThemeToggle } from "./ThemeToggle"; // Import ThemeToggle
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -24,29 +25,9 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         <Link to="/" className="text-2xl font-bold">
           Booking App
         </Link>
-        {/* Su desktop, i link di navigazione sono ora gestiti dalla Sidebar. */}
-        {/* Il div seguente è stato rimosso per evitare la duplicazione dei link. */}
-        {/*
-        {!isMobile && (
-          <div className="space-x-4">
-            <Link to="/">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
-                Home
-              </Button>
-            </Link>
-            <Link to="/rooms">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
-                Sale Riunioni
-              </Button>
-            </Link>
-            <Link to="/my-bookings">
-              <Button variant="ghost" className="text-primary-foreground hover:bg-primary-foreground/20">
-                Le mie Prenotazioni
-              </Button>
-            </Link>
-          </div>
-        )}
-        */}
+        <div className="flex items-center space-x-2"> {/* Added a div to group items on the right */}
+          <ThemeToggle /> {/* Add ThemeToggle here */}
+        </div>
       </div>
     </nav>
   );
