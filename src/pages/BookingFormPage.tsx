@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,13 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn, generateTimeSlots } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, startOfDay, endOfDay } from "date-fns";
 import { it } from "date-fns/locale";
 import { showSuccess, showError } from "@/utils/toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createBookingFormSchema } from "@/lib/bookingValidation";
 import { useBookings } from "@/context/BookingContext";
-import BookedSlotsDisplay from "@/components/BookedSlotsDisplay"; // Import BookedSlotsDisplay
+import BookedSlotsDisplay from "@/components/BookedSlotsDisplay";
+import { supabase } from "@/integrations/supabase/client";
+import { Booking } from "@/types";
 
 interface BookingFormValues {
   title: string;
@@ -29,17 +31,17 @@ interface BookingFormValues {
 const BookingFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { rooms, bookings, addBooking } = useBookings();
+  const { rooms, addBooking } = useBookings();
 
   const room = rooms.find((r) => r.id === id);
   const roomId = id || '';
 
   const timeSlots = generateTimeSlots();
 
-  const bookingFormSchema = createBookingFormSchema(roomId, undefined, bookings);
+  const [allRoomBookingsForSelectedDate, setAllRoomBookingsForSelectedDate] = useState<Booking[]>([]);
 
   const form = useForm<BookingFormValues>({
-    resolver: zodResolver(bookingFormSchema),
+    resolver: zodResolver(createBookingFormSchema(roomId, undefined, allRoomBookingsForSelectedDate)),
     defaultValues: {
       title: "",
       organizer: "",
@@ -49,7 +51,47 @@ const BookingFormPage: React.FC = () => {
     },
   });
 
-  const selectedDate = form.watch("date"); // Watch for changes in the selected date
+  const selectedDate = form.watch("date");
+
+  useEffect(() => {
+    const fetchAllRoomBookings = async () => {
+      if (!roomId || !selectedDate) return;
+
+      const start = startOfDay(selectedDate).toISOString();
+      const end = endOfDay(selectedDate).toISOString();
+
+      const { data, error } = await supabase
+        .from("bookings")
+        .select("*")
+        .eq("room_id", roomId)
+        .gte("start_time", start)
+        .lte("end_time", end);
+
+      if (error) {
+        console.error("Error fetching all room bookings for validation:", error);
+        showError("Errore nel caricamento delle prenotazioni per la validazione.");
+        setAllRoomBookingsForSelectedDate([]);
+      } else {
+        const formattedBookings: Booking[] = (data || []).map((b: any) => ({
+          id: b.id,
+          roomId: b.room_id,
+          userId: b.user_id,
+          title: b.title,
+          startTime: new Date(b.start_time),
+          endTime: new Date(b.end_time),
+          organizer: b.organizer,
+        }));
+        setAllRoomBookingsForSelectedDate(formattedBookings);
+      }
+    };
+
+    fetchAllRoomBookings();
+  }, [roomId, selectedDate]);
+
+  useEffect(() => {
+    form.setResolver(zodResolver(createBookingFormSchema(roomId, undefined, allRoomBookingsForSelectedDate)));
+  }, [roomId, allRoomBookingsForSelectedDate, form]);
+
 
   if (!room) {
     return (
@@ -65,7 +107,7 @@ const BookingFormPage: React.FC = () => {
     );
   }
 
-  const onSubmit = (values: BookingFormValues) => {
+  const onSubmit = async (values: BookingFormValues) => {
     try {
       const startTime = new Date(values.date);
       const [startHour, startMinute] = values.startTime.split(':').map(Number);
@@ -76,7 +118,6 @@ const BookingFormPage: React.FC = () => {
       endTime.setHours(endHour, endMinute, 0, 0);
 
       const newBooking = {
-        id: `booking-${Date.now()}`,
         roomId: room.id,
         title: values.title,
         startTime,
@@ -84,7 +125,7 @@ const BookingFormPage: React.FC = () => {
         organizer: values.organizer,
       };
 
-      addBooking(newBooking);
+      await addBooking(newBooking);
       showSuccess("Prenotazione effettuata con successo!");
       navigate(`/rooms/${room.id}`);
     } catch (error) {
@@ -179,7 +220,7 @@ const BookingFormPage: React.FC = () => {
                 <BookedSlotsDisplay
                   roomId={roomId}
                   selectedDate={selectedDate}
-                  allBookings={bookings}
+                  allBookings={allRoomBookingsForSelectedDate}
                 />
               )}
               <div className="grid grid-cols-2 gap-4">

@@ -2,7 +2,7 @@ import * as z from "zod";
 import { format } from "date-fns";
 import { Booking } from "@/types";
 
-export const createBookingFormSchema = (roomId: string, currentBookingId: string | undefined, currentBookings: Booking[]) => z.object({
+export const createBookingFormSchema = (roomId: string, currentBookingId: string | undefined, allBookingsForRoomAndDate: Booking[]) => z.object({
   title: z.string().min(2, { message: "Il titolo deve contenere almeno 2 caratteri." }),
   organizer: z.string().min(2, { message: "Il nome dell'organizzatore deve contenere almeno 2 caratteri." }),
   date: z.date({ required_error: "Seleziona una data per la prenotazione." }),
@@ -32,14 +32,12 @@ export const createBookingFormSchema = (roomId: string, currentBookingId: string
     const [newEndHour, newEndMinute] = endTime.split(':').map(Number);
     newBookingEnd.setHours(newEndHour, newEndMinute, 0, 0);
 
-    const existingBookingsForRoomAndDate = currentBookings.filter(
-      (booking) =>
-        booking.roomId === roomId &&
-        booking.id !== currentBookingId &&
-        format(booking.startTime, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+    // Filtra tutte le prenotazioni per la sala e la data selezionata, escludendo quella che stiamo modificando (se in modalità modifica)
+    const existingBookingsForValidation = allBookingsForRoomAndDate.filter(
+      (booking) => booking.id !== currentBookingId
     );
 
-    const hasOverlap = existingBookingsForRoomAndDate.some((existingBooking) => {
+    const hasOverlap = existingBookingsForValidation.some((existingBooking) => {
       const existingStart = existingBooking.startTime;
       const existingEnd = existingBooking.endTime;
 
