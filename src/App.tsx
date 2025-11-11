@@ -13,8 +13,9 @@ import Layout from "./components/Layout";
 import { BookingProvider } from "./context/BookingContext";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { SessionProvider } from "./context/SessionContext";
-import { ProfileProvider } from "./context/ProfileContext"; // Import ProfileProvider
+import { ProfileProvider } from "./context/ProfileContext";
 import Login from "./pages/Login";
+import ProfilePage from "./pages/ProfilePage"; // Import ProfilePage
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <SessionProvider>
-            <ProfileProvider> {/* Wrap with ProfileProvider */}
+            <ProfileProvider>
               <BookingProvider>
                 <Layout>
                   <Routes>
@@ -36,6 +37,7 @@ const App = () => (
                     <Route path="/rooms/:id/book" element={<BookingFormPage />} />
                     <Route path="/rooms/:roomId/bookings/:bookingId/edit" element={<EditBookingPage />} />
                     <Route path="/my-bookings" element={<MyBookingsPage />} />
+                    <Route path="/profile" element={<ProfilePage />} /> {/* Add ProfilePage route */}
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

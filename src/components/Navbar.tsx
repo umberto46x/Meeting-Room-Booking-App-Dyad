@@ -3,12 +3,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, LogOut } from "lucide-react"; // Import LogOut icon
+import { Menu, LogOut, UserCircle2 } from "lucide-react"; // Import UserCircle2 icon
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ThemeToggle } from "./ThemeToggle";
-import { useSession } from "@/context/SessionContext"; // Import useSession
-import { supabase } from "@/integrations/supabase/client"; // Import supabase client
-import { showError } from "@/utils/toast"; // Import showError
+import { useSession } from "@/context/SessionContext";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"; // Import DropdownMenu components
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -16,7 +23,7 @@ interface NavbarProps {
 
 const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
   const isMobile = useIsMobile();
-  const { session } = useSession(); // Get session from context
+  const { session } = useSession();
 
   const handleLogout = async () => {
     try {
@@ -41,11 +48,28 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
         </Link>
         <div className="flex items-center space-x-2">
           <ThemeToggle />
-          {session && ( // Show logout button only if session exists
-            <Button variant="ghost" size="icon" onClick={handleLogout} className="text-primary-foreground">
-              <LogOut className="h-6 w-6" />
-              <span className="sr-only">Logout</span>
-            </Button>
+          {session && ( // Show dropdown menu only if session exists
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-primary-foreground">
+                  <UserCircle2 className="h-6 w-6" />
+                  <span className="sr-only">Menu Utente</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="flex items-center">
+                    <UserCircle2 className="mr-2 h-4 w-4" />
+                    Profilo
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="flex items-center text-destructive focus:text-destructive">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
       </div>
