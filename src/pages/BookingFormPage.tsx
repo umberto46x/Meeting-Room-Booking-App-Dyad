@@ -99,9 +99,10 @@ const BookingFormPage: React.FC = () => {
     fetchAllRoomBookings();
   }, [roomId, selectedDate]);
 
-  useEffect(() => {
-    form.setResolver(zodResolver(createBookingFormSchema(roomId, undefined, allRoomBookingsForSelectedDate)));
-  }, [roomId, allRoomBookingsForSelectedDate, form]);
+  // Rimosso: form.setResolver non è una funzione
+  // useEffect(() => {
+  //   form.setResolver(zodResolver(createBookingFormSchema(roomId, undefined, allRoomBookingsForSelectedDate)));
+  // }, [roomId, allRoomBookingsForSelectedDate, form]);
 
 
   if (!room) {
